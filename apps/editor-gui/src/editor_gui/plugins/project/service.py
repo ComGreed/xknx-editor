@@ -1900,6 +1900,7 @@ class ProjectService:
         *,
         password: str | None = None,
         project_password: str | None = None,
+        without_password: bool = False,
         cancel: threading.Event | None = None,
         committing: Callable[[], None] | None = None,
     ) -> None:
@@ -1913,6 +1914,9 @@ class ProjectService:
         A ``.knxproj`` bundles the (unencrypted) manufacturer/application data for the products it
         uses, so we also ingest it into the catalog — without it the device view cannot resolve the
         applications and would skip every imported device.
+
+        An archive with KNX Secure data but no password raises ``ProjectPasswordRequired`` unless
+        ``without_password`` is set (then the new project keeps its keys in the clear).
 
         The parse-and-write goes into a sibling temp file the live service never references, so the
         whole schema build/DDL happens off to the side; only once it is complete do we close any
@@ -1949,7 +1953,11 @@ class ProjectService:
                 # project is left untouched.
                 check_cancelled(cancel)
                 _import_knxproj(
-                    source, tmp, password=password, project_password=project_password
+                    source,
+                    tmp,
+                    password=password,
+                    project_password=project_password,
+                    without_password=without_password,
                 )
                 check_cancelled(cancel)
                 self._log.debug(

@@ -202,6 +202,30 @@ def test_import_keeps_the_keys_encrypted(tmp_path: Path) -> None:
     svc.close(pid)
 
 
+def test_import_without_password(tmp_path: Path) -> None:
+    src, _ = _project(tmp_path, _SECURITY)
+    out = tmp_path / "out.knxproj"
+    export_knxproj(src, out, schema="23")
+    again = tmp_path / "again.xknx"
+    # Opting out of the password: the import goes through and keeps every key in the clear.
+    pid = import_knxproj(out, again, without_password=True)
+    assert _secrets_in(again) == [_KEY, "Auth-Code-7", "305419896", _TRACING_PASSWORD]
+
+    svc = ProjectService()
+    opened = svc.open(again)  # no password needed
+    assert not svc.is_password_protected(opened)
+    device = next(d for d in svc.devices(opened) if d.product_ref_id == "M-1_H-1_P-1")
+    key = bytes(range(16))
+    assert svc.device_keys(opened, device.id) == DeviceKeys(
+        tool_key=key, loaded_tool_key=key
+    )
+    # A password can still be set afterwards; the keys leave the clear.
+    svc.set_project_password(opened, _PASSWORD)
+    assert _secrets_in(again) == []
+    svc.close(opened)
+    assert pid == svc.open(again, _PASSWORD)
+
+
 def test_an_unprotected_project_with_secure_data_gets_a_password(
     tmp_path: Path,
 ) -> None:
