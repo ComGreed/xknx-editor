@@ -194,6 +194,7 @@ def import_knxproj(
     project_password: str | None = None,
     language: str | None = None,
     project_id: str | None = None,
+    without_password: bool = False,
 ) -> str:
     """Parse ``source`` (a ``.knxproj``) and write it as a new project at ``dest``.
 
@@ -203,7 +204,9 @@ def import_knxproj(
     A protected archive's password protects the new project, else ``project_password`` (if any):
     the project's secrets are stored encrypted with it (see :mod:`project_secrets`). An archive with
     KNX Secure data but neither password raises :class:`ProjectPasswordRequired`, before ``dest``
-    is written.
+    is written — unless ``without_password`` is set, when the import goes through and the new
+    project keeps its secrets in the clear (the user may protect it later; a project with KNX
+    Secure data cannot drop a password it has).
 
     Raises :class:`~xknxproject.exceptions.InvalidPasswordException` when the archive is protected
     and no/a wrong password was given (standard-zip encryption reports a wrong password only as a
@@ -261,7 +264,8 @@ def import_knxproj(
                 project = session.query(Project).one()
                 project.password_salt = salt
                 project.password_check = cipher.check_value()
-            elif has_secure_data(session):
+            elif has_secure_data(session) and not without_password:
+                # Without a password the keys would sit in the clear; only with an explicit opt-out.
                 session.rollback()
                 raise ProjectPasswordRequired(
                     "a project with KNX Secure data needs a password"

@@ -761,10 +761,12 @@ class KnxGuiApp:
         self._vd_password_requested = False
         self._vd_password = ""
         self._vd_password_retry: Callable[[], None] | None = None
-        # The password a project with KNX Secure data needs: set it (``_action``) or give up.
+        # The password a project with KNX Secure data needs: set it (``_action``), give up
+        # (``_cancel``) or, when offered, keep the keys in the clear (``_without``).
         self._new_password_requested = False
         self._new_password_action: Callable[[str], None] | None = None
         self._new_password_cancel: Callable[[], None] | None = None
+        self._new_password_without: Callable[[], None] | None = None
         self._new_password_prompt: str | None = None
         self._new_password_form = NewPasswordForm()
         # Network-drive consent: when opening/importing to a location SQLite can't use (SMB/NFS), we
@@ -784,6 +786,8 @@ class KnxGuiApp:
         self._import_pw: str | None = None
         self._import_needs_password = False
         self._import_needs_project_password = False
+        # The import goes through with its KNX Secure keys in the clear (no project password).
+        self._import_without_password = False
         # Generic background worker (catalog load, project open) sharing the progress modal.
         self._bg_thread: threading.Thread | None = None
         # Shared progress-modal state, driven by both the importer and generic background ops.
@@ -2720,7 +2724,10 @@ class KnxGuiApp:
         self._maybe_consent_then(dest, lambda: self._start_import(None))
 
     def _start_import(
-        self, password: str | None, project_password: str | None = None
+        self,
+        password: str | None,
+        project_password: str | None = None,
+        without_password: bool = False,
     ) -> None:
         """Run the import on a worker thread so the UI stays responsive (the facade holds the shared
         lock, so per-frame reads bail to empty placeholders while it runs)."""
@@ -2745,6 +2752,7 @@ class KnxGuiApp:
         self._log.info("importing knxproj", source=source, dest=dest)
         self._import_pw = password
         self._import_project_password = project_password
+        self._import_without_password = without_password
         self._import_needs_password = False
         self._import_needs_project_password = False
         self._begin_progress(S.IMPORT_PROGRESS_TEXT)
@@ -2752,7 +2760,7 @@ class KnxGuiApp:
         self._offer_cancel(cancel)
         self._import_thread = threading.Thread(
             target=self._run_import,
-            args=(source, dest, password, project_password, cancel),
+            args=(source, dest, password, project_password, without_password, cancel),
             daemon=True,
             name="knxproj-import",
         )
@@ -2765,12 +2773,13 @@ class KnxGuiApp:
         dest: str,
         password: str | None,
         project_password: str | None,
+        without_password: bool,
         cancel: threading.Event | None = None,
     ) -> None:
         # Worker thread: only touches services + logging (never imgui). Outcome is read in
         # _poll_import on the UI thread once the thread has finished.
         self._import_needs_password = self._try_import_knxproj(
-            source, dest, password, project_password, cancel
+            source, dest, password, project_password, without_password, cancel
         )
 
     def _poll_import(self) -> None:
@@ -2781,11 +2790,13 @@ class KnxGuiApp:
         self._import_thread = None
         self._progress_running = False
         if self._import_needs_project_password:
-            # An archive with KNX Secure data but no password: the new project needs one.
+            # An archive with KNX Secure data but no password: the new project needs one — or, on
+            # request, keeps its keys in the clear.
             password = self._import_pw
             self._request_new_password(
                 lambda chosen: self._start_import(password, chosen),
                 self._clear_import_prompt,
+                without=lambda: self._start_import(self._import_pw, None, True),
             )
         elif self._import_needs_password:
             # Wrong password on retry (a password was supplied); otherwise the first prompt.
@@ -2956,6 +2967,7 @@ class KnxGuiApp:
         dest: str,
         password: str | None,
         project_password: str | None = None,
+        without_password: bool = False,
         cancel: threading.Event | None = None,
     ) -> bool:
         """Attempt the import. Returns ``True`` if a password is required (or wrong) and the caller
@@ -2977,6 +2989,7 @@ class KnxGuiApp:
                 Path(dest),
                 password=password,
                 project_password=project_password,
+                without_password=without_password,
                 cancel=cancel,
                 committing=self._cancel_no_longer_possible,
             )
@@ -3668,10 +3681,14 @@ class KnxGuiApp:
         self,
         action: Callable[[str], None],
         cancel: Callable[[], None],
+        without: Callable[[], None] | None = None,
         prompt: str | None = None,
     ) -> None:
+        """Ask for a new project password. ``without``, when given, offers keeping the keys in the
+        clear instead (an import of an unprotected archive with KNX Secure data)."""
         self._new_password_action = action
         self._new_password_cancel = cancel
+        self._new_password_without = without
         self._new_password_prompt = prompt
         self._new_password_form.reset()
         self._new_password_requested = True
@@ -3689,7 +3706,7 @@ class KnxGuiApp:
 
             self._run_bg(S.PROGRESS_PROTECT_PROJECT, work)
 
-        self._request_new_password(protect, cancel, prompt)
+        self._request_new_password(protect, cancel, prompt=prompt)
 
     def _render_new_password_modal(self) -> None:
         title = f"{S.IMPORT_PASSWORD_TITLE}###new-password"
@@ -3709,17 +3726,36 @@ class KnxGuiApp:
         submitted = form.render(
             S.PASSWORD_LABEL, S.PASSWORD_REPEAT_LABEL, S.PASSWORD_MISMATCH
         )
-        clicked = dialog_buttons(S.BTN_OK, S.BTN_CANCEL, enabled=[form.valid, True])
+        without = self._new_password_without
+        if without is not None:
+            # The import may also go through without a password (its keys kept in the clear).
+            clicked = dialog_buttons(
+                S.BTN_OK,
+                S.BTN_WITHOUT_PASSWORD,
+                S.BTN_CANCEL,
+                enabled=[form.valid, True, True],
+            )
+        else:
+            clicked = dialog_buttons(S.BTN_OK, S.BTN_CANCEL, enabled=[form.valid, True])
         if clicked == 0 or (submitted and form.valid):
-            action, password = self._new_password_action, form.password
+            action = self._new_password_action
+            password = form.password
             self._new_password_action = self._new_password_cancel = None
+            self._new_password_without = None
             form.reset()
             imgui.close_current_popup()
             if action is not None:
                 action(password)
-        elif clicked == 1:
+        elif without is not None and clicked == 1:
+            self._new_password_action = self._new_password_cancel = None
+            self._new_password_without = None
+            form.reset()
+            imgui.close_current_popup()
+            without()
+        elif clicked == (2 if without is not None else 1):
             cancel = self._new_password_cancel
             self._new_password_action = self._new_password_cancel = None
+            self._new_password_without = None
             form.reset()
             imgui.close_current_popup()
             if cancel is not None:

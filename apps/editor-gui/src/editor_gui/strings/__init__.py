@@ -2042,6 +2042,10 @@ class MenuStrings:
         return _("OK")
 
     @property
+    def BTN_WITHOUT_PASSWORD(self) -> str:
+        return _("Without Password")
+
+    @property
     def BTN_CANCEL(self) -> str:
         return _("Cancel")
 
