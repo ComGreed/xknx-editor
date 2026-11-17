@@ -1458,6 +1458,7 @@ class ProjectService:
         *,
         address: int | None = None,
         name: str = "",
+        addin_data: Sequence[tuple[str, str, bytes, str]] = (),
         hardware2program_ref_id: str | None = None,
         application_program_ref_id: str | None = None,
         parameters: list[tuple[str, str]] | None = None,
@@ -1518,6 +1519,10 @@ class ProjectService:
             product_ref_id=product_ref_id,
             hardware2program_ref_id=hardware2program_ref_id,
             application_program_ref_id=application_program_ref_id,
+            addin_data=[
+                [app, suffix, base64.b64encode(data).decode("ascii"), metadata]
+                for app, suffix, data, metadata in addin_data
+            ],
             parameters=[[ref, value] for ref, value in (parameters or [])],
             com_objects=[[ref, channel] for ref, channel in (com_objects or [])],
             module_instances=[[iid, rid] for iid, rid in (module_instances or [])],
@@ -2790,6 +2795,30 @@ class ProjectService:
         """The project's ``CodePage`` (a ``knx:TextEncoding_t`` value such as ``iso-8859-1``), or
         ``None`` for the system language."""
         return (self.project(project_id).extra_attributes or {}).get("CodePage")
+
+    def project_user_file(self, project_id: str, filename: str) -> bytes | None:
+        from .user_files import read_user_file
+
+        return read_user_file(self.project(project_id), filename)
+
+    def set_project_user_file(
+        self, project_id: str, filename: str, data: bytes, *, label: str
+    ) -> None:
+        """Store a shared attachment and its metadata as one undo step."""
+        from .events import SetProjectUserFile
+
+        if self.project_user_file(project_id, filename) == data:
+            return
+        self._state(project_id).store.append(
+            CompositeEvent(
+                events=[
+                    SetProjectUserFile(
+                        project_id, filename, base64.b64encode(data).decode("ascii")
+                    )
+                ],
+                label=label,
+            )
+        )
 
     def set_project_code_page(self, project_id: str, code_page: str | None) -> None:
         """Set the project's ``CodePage`` (one undo step); ``None`` is the system language. Raises
@@ -4483,6 +4512,58 @@ class ProjectService:
         else:
             store.append(CompositeEvent(events=[event], label=label))
 
+    def device_addin_data(
+        self, project_id: str, device_id: int, app_id: str
+    ) -> dict[str, bytes]:
+        device = self._require_device(self._state(project_id), device_id)
+        return {
+            row.suffix: row.data for row in device.addin_data if row.app_id == app_id
+        }
+
+    def set_device_addin_data(
+        self,
+        project_id: str,
+        device_id: int,
+        app_id: str,
+        entries: Mapping[str, bytes | None],
+        *,
+        label: str | None = None,
+        metadata: Mapping[str, str] | None = None,
+    ) -> None:
+        """Persist app attachment changes together; None removes an entry."""
+        import base64
+
+        from .events import SetDeviceAddinData
+
+        previous = self.device_addin_data(project_id, device_id, app_id)
+        old_metadata = {
+            r.suffix: r.metadata_xml
+            for r in self._require_device(self._state(project_id), device_id).addin_data
+            if r.app_id == app_id
+        }
+        changes = {
+            key: base64.b64encode(value).decode("ascii") if value is not None else None
+            for key, value in entries.items()
+            if previous.get(key) != value
+            or (
+                value is not None
+                and metadata is not None
+                and key in metadata
+                and old_metadata.get(key) != metadata[key]
+            )
+        }
+        if changes:
+            self._state(project_id).store.append(
+                CompositeEvent(
+                    events=[
+                        SetDeviceAddinData(
+                            device_id, app_id, changes, metadata=dict(metadata or {})
+                        )
+                    ],
+                    label=label,
+                )
+            )
+
     def configure_native_device(
         self,
         project_id: str,
@@ -5790,6 +5871,11 @@ class ProjectService:
         cipher: ProjectCipher | None = None,
         password: str | None = None,
     ) -> None:
+        from .addin_data import normalize_addin_data
+
+        project = session.get(Project, project_id)
+        if project is not None and normalize_addin_data(session, project):
+            session.commit()
         self._projects[project_id] = _Open(
             engine, session, EventStore(session), cipher, password
         )

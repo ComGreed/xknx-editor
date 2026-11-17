@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from dataclasses import replace
 from typing import TYPE_CHECKING
 
@@ -13,6 +14,7 @@ from editor_gui.device_channels import ComObjectModule
 from editor_gui.dpt import lookup_or_make_dpt
 from xknxeditor.download.scope import DownloadScope
 from xknxeditor.download.tables import com_object_flag_byte, priority_from_bits
+from xknxeditor.namespaces.intermediate import Enable
 from xknxeditor.prod.parser_v2.application_indexer import ApplicationIndexer
 from xknxeditor.vendor.powertool import (
     BLOB_NAME,
@@ -65,6 +67,8 @@ if TYPE_CHECKING:
 
 from . import NativeConfiguration, NativeObject, PluginCapabilities, compatible_dpt
 
+_LOGGER = logging.getLogger("xknxeditor.vendor.powertool")
+
 FLAGS = {
     "communication": 4,
     "read": 8,
@@ -89,6 +93,10 @@ def configuration(device: Device) -> Configuration:
 def install_view(device: Device) -> None:
     if not any(r.name == BLOB_NAME for r in device.binary_data):
         return
+    from editor_gui.languages import product_language
+    from xknxeditor.vendor.powertool.family import FamilyConfig, schema_for
+    from xknxeditor.vendor.powertool.presentation import Presentation
+
     device.native_objects = []
     device.native_modules = []
     device.native_error = None
@@ -103,6 +111,13 @@ def install_view(device: Device) -> None:
             raise ValueError("native object bindings disagree with the product")
         catalog = ApplicationIndexer(device.app.program)
         overrides = {r.ref_id: r for r in device.com_object_instance_refs}
+        language = product_language()
+        presentation = Presentation(
+            schema_for(config.profile, config.database_code)["code"]
+            if isinstance(config, FamilyConfig)
+            else 3,
+            language,
+        )
         for role in compiled.objects:
             if not role.visible:
                 continue
@@ -118,7 +133,15 @@ def install_view(device: Device) -> None:
             device.native_objects.append(
                 ComObject(
                     id=ref,
-                    name=role.name,
+                    name=presentation.text(
+                        role.key.rsplit("/", 1)[-1]
+                        if isinstance(config, FamilyConfig)
+                        else presentation.native_node(
+                            config.channels[role.channel].function,
+                            object_key=role.key.rsplit("/", 1)[-1],
+                        ),
+                        role.name,
+                    ),
                     dpt=lookup_or_make_dpt(role.dpt),
                     flags=flags,
                     number=catalog.com_objects[
@@ -131,7 +154,7 @@ def install_view(device: Device) -> None:
                     else priority_from_bits(role.flags),
                 )
             )
-        for channel, label in enumerate(channel_labels(config)):
+        for channel, label in enumerate(channel_labels(config, language)):
             refs = frozenset(
                 bindings[o.key]
                 for o in compiled.objects
@@ -178,7 +201,25 @@ def _stored_objects(
             not compatible_dpt(obj.dpt, token) for token in source.datapoint_type
         ):
             continue
-        matched.append(replace(obj, reference=candidates[0]))
+        reference = catalog.com_object_refs[source.ref_id]
+        base = catalog.com_objects[reference.ref_id]
+        flags = {}
+        for name in FLAGS:
+            value = getattr(source, name + "_flag")
+            if value is None:
+                value = getattr(reference, name + "_flag")
+            if value is None:
+                value = getattr(base, name + "_flag")
+            flags[name] = value is Enable.ENABLED
+        priority = source.priority or reference.priority or base.priority
+        matched.append(
+            replace(
+                obj,
+                reference=source.ref_id,
+                flags=flags,
+                priority=priority.value,
+            )
+        )
     return tuple(matched)
 
 
@@ -226,24 +267,10 @@ def _prepare(
             for role, ref in config.bindings.items()
         }
     else:
-        overrides = {r.ref_id: r for r in device.com_object_instance_refs}
-        flags = {}
-        for obj in sources:
-            override = overrides[obj.reference]
-            values = dict(obj.flags)
-            if device.com_object_flag_overrides is not None:
-                values.update(device.com_object_flag_overrides.get(obj.reference, {}))
-            else:
-                for name in FLAGS:
-                    value = getattr(override, name + "_flag")
-                    if value is not None:
-                        values[name] = value.value == "Enabled"
-            flags[obj.key] = com_object_flag_byte(
-                priority=override.priority.value
-                if override.priority is not None
-                else obj.priority,
-                **values,
-            )
+        flags = {
+            obj.key: com_object_flag_byte(priority=obj.priority, **obj.flags)
+            for obj in sources
+        }
     try:
         individual_address = IndividualAddress(device.individual_address).raw
     except CouldNotParseAddress as exc:
@@ -269,11 +296,30 @@ def _prepare(
         domain_address=communication.domain_address or 0 if communication else 0,
         repeater_present=communication.repeater_present if communication else False,
     )
-    return prepare_image(
+    prepared = prepare_image(
         compile_image(config, host, associations, flags),
         secondary_application=secondary,
         application=device.app,
     )
+    if _LOGGER.isEnabledFor(logging.DEBUG):
+        for obj in compiled.objects:
+            effective = flags.get(obj.key, obj.flags)
+            if effective != obj.flags:
+                _LOGGER.debug(
+                    "PowerTool %s: project flags for %s override saved flags %02x -> %02x",
+                    device.individual_address,
+                    obj.key,
+                    obj.flags,
+                    effective,
+                )
+        _LOGGER.debug(
+            "PowerTool %s (%s): prepared payload lengths %s, allocation reservations %s",
+            device.individual_address,
+            device.app.id,
+            dict(prepared.resource_sizes),
+            dict(prepared.image.allocation_sizes),
+        )
+    return prepared
 
 
 class PowerToolProvider:

@@ -76,6 +76,7 @@ from editor_gui.plugins.project.ui.device_compare import DeviceComparePanel
 from editor_gui.plugins.project.ui.element_details import ElementDetailsPanel
 from editor_gui.plugins.project.ui.generic_plugin_panel import GenericPluginPanel
 from editor_gui.plugins.project.ui.group_value import GroupValueActions
+from editor_gui.plugins.project.ui.mdt_dca import MdtDcaPanel
 from editor_gui.plugins.project.ui.memory_preview import MemoryPreviewWindow
 from editor_gui.plugins.project.ui.paste_special import PasteSpecialDialog
 from editor_gui.plugins.project.ui.plugin_params_panel import PluginParamsPanel
@@ -163,6 +164,7 @@ _QUEUED_OPERATIONS = frozenset(
         "dali",
         "siemens_dali",
         "siemens_dca",
+        "mdt_symbols",
     }
 )
 
@@ -389,6 +391,7 @@ class ProjectPlugin:
             has_plugin_params=lambda d: (
                 api.project.plugin_mapping(d) is not None
                 or self._has_plugin_comparison(d)
+                or api.project.mdt_dca_profile(d) is not None
             ),
             plugin_capabilities=api.project.plugin_capabilities,
             on_navigate_ga=self._navigate_to_group_address,
@@ -442,6 +445,10 @@ class ProjectPlugin:
         from editor_gui.plugins.project.ui.native_plugin import NativePluginPanel
 
         self._native_plugin_panel = NativePluginPanel()
+        self._mdt_dca_panel = MdtDcaPanel(
+            self._queue_bus_action,
+            connected=lambda: api.connection.xknx is not None,
+        )
         self._siemens_dali_panel = SiemensDaliPanel(
             self._run_siemens_dali, _generation=lambda: api.project.generation
         )
@@ -1182,6 +1189,8 @@ class ProjectPlugin:
             return None
         conn = self._api.connection
         start: Callable[[Device], Future[Any] | None]
+        finish: Callable[[Any], Any] | None = None
+        target = None
         match kind:
             case "restart":
                 text, start = S.BTN_RESTART_DEVICE, conn.restart_device
@@ -1218,6 +1227,26 @@ class ProjectPlugin:
                 start = functools.partial(
                     conn.run_siemens_dca_program, blob_xml=options["data"]
                 )
+            case "read_mdt_symbols":
+                target = self._api.project.prepare_mdt_symbol_read(node_id)
+                text, start = S.MDT_READ_SYMBOLS, conn.read_mdt_symbols
+                finish = functools.partial(
+                    self._api.project.apply_mdt_symbol_read, target
+                )
+            case "mdt_symbols":
+                text = (
+                    S.MDT_SYNCHRONIZE_SYMBOLS
+                    if options.get("synchronize")
+                    else S.MDT_PROGRAM_SYMBOLS
+                    if options.get("writes")
+                    else S.MDT_COMPARE_SYMBOLS
+                )
+                start = functools.partial(
+                    conn.run_mdt_symbols,
+                    symbols=options["symbols"],
+                    writes=options.get("writes", False),
+                    synchronize=options.get("synchronize", False),
+                )
             case "read_memory" | "read_plugin_memory":
                 text = S.MEMORY_READ
                 start = functools.partial(conn.read_memory, request=options["request"])
@@ -1244,6 +1273,8 @@ class ProjectPlugin:
                 "read_plugin_memory",
                 "dali",
                 "siemens_dali",
+                "mdt_symbols",
+                "read_mdt_symbols",
             ) and (
                 self._api.project.generation != generation
                 or current.individual_address != item.address
@@ -1267,6 +1298,17 @@ class ProjectPlugin:
                 and self._generic_memory_request(current) != options["request"]
             ):
                 raise ValueError("Memory layout changed while the read was queued")
+            elif kind == "mdt_symbols":
+                symbols = self._api.project.mdt_symbol_payload(
+                    node_id, include_defaults=options.get("include_defaults", False)
+                )
+                if symbols != options["symbols"]:
+                    raise ValueError("Symbols changed while the operation was queued")
+            elif (
+                kind == "read_mdt_symbols"
+                and self._api.project.prepare_mdt_symbol_read(node_id) != target
+            ):
+                raise ValueError("Symbols changed while the operation was queued")
             future = start(current)
             if future is None and conn.xknx is None:
                 item.message = S.SCRIPT_NOT_CONNECTED
@@ -1284,8 +1326,17 @@ class ProjectPlugin:
             kind,
             text,
             start_action
-            if kind in ("read_memory", "read_plugin_memory", "dali", "siemens_dali")
+            if kind
+            in (
+                "read_memory",
+                "read_plugin_memory",
+                "dali",
+                "siemens_dali",
+                "mdt_symbols",
+                "read_mdt_symbols",
+            )
             else begin,
+            finish=finish,
         )
         if ended is not None:
             assert item.ended is not None
@@ -1413,6 +1464,7 @@ class ProjectPlugin:
         """Render configuration actions, optional comparison and editable parameters."""
         self._poll_triton_prj_dialog()
         self._poll_triton_prj_save()
+        self._mdt_dca_panel.render(device, self._api.project)
         self._native_plugin_panel.render(device, self._api.project)
         self._generic_plugin_panel.render_section(device)
         if self._api.project.plugin_mapping(device) is not None:
@@ -3689,11 +3741,15 @@ class ProjectPlugin:
                 item.message = S.SCRIPT_NOT_CONNECTED
             return None
         if item.origin is None:
+            from editor_gui.plugin_params import mapping_for_device
+
+            mapping = mapping_for_device(device)
+            powertool = mapping is not None and mapping.provider == "powertool"
             scope_name = scope_label(item.scope)
 
             def done(f: "Future[Any]") -> None:
                 if not item.canceled_by_user:
-                    self._on_eval_done(label, scope_name, runtime, driven, f)
+                    self._on_eval_done(label, scope_name, runtime, driven, f, powertool)
 
             future.add_done_callback(done)
         return future
@@ -3725,6 +3781,7 @@ class ProjectPlugin:
         runtime: set[int],
         driven: dict[int, int],
         future: "Future[Any]",
+        powertool: bool = False,
     ) -> None:
         """Runs on the async loop thread; only hands the result to the (thread-safe) window."""
         if future.cancelled():
@@ -3736,7 +3793,7 @@ class ProjectPlugin:
             self._preflight_result.submit_error(label, scope_name, text)
             return
         self._preflight_result.submit_result(
-            label, scope_name, future.result(), runtime, driven
+            label, scope_name, future.result(), runtime, driven, powertool
         )
 
     def _group_communication_for(self, device: "Device") -> "GroupCommunication | None":

@@ -220,8 +220,8 @@ msgstr "Preizkus samo za branje: primerja, kaj bi prenos zapisal, s tem, kar je 
 msgid "Cannot run: no KNX connection. Connect to a gateway ({menu} menu) and make sure the device is reachable at its individual address."
 msgstr "Ni mogoče zagnati: ni povezave KNX. Povežite se s prehodom (meni {menu}) in se prepričajte, da je naprava dosegljiva na svojem fizičnem naslovu."
 
-msgid "Match: the generated image is identical to what is on the device."
-msgstr "Ujemanje: ustvarjena slika je enaka tisti v napravi."
+msgid "Match: all compared memory bytes and properties match the device."
+msgstr "Ujemanje: vsi primerjani pomnilniški bajti in lastnosti se ujemajo z napravo."
 
 msgid "{matched} matched, {changed} would change"
 msgstr "Ujemajoči se: {matched}, bi se spremenili: {changed}"
@@ -379,8 +379,8 @@ msgstr "Linija {number} je odstranjena"
 msgid "Line: {old} -> {new}"
 msgstr "Linija: {old} -> {new}"
 
-msgid "Cannot run: the project was changed since it was opened and may no longer match the device. Undo the changes of this session, or save and reopen the project."
-msgstr "Ni mogoče zagnati: projekt je bil od odprtja spremenjen in se morda ne ujema več z napravo. Razveljavite spremembe te seje ali shranite projekt in ga znova odprite."
+msgid "Cannot run: the project was changed since it was opened and may no longer match the device. Undo the changes of this session, or reopen the project."
+msgstr "Ni mogoče zagnati: projekt je bil od odprtja spremenjen in se morda ne ujema več z napravo. Razveljavite spremembe te seje ali znova odprite projekt."
 
 msgid "Duplicate"
 msgstr "Podvoji"
@@ -3473,3 +3473,191 @@ msgstr "Izberite napravi za primerjavo."
 
 msgid "Loading application programs… {done}/{total}"
 msgstr "Nalaganje aplikacijskih programov… {done}/{total}"
+msgid "Symbol"
+msgstr "Simbol"
+
+msgid "Use the newer symbol library"
+msgstr "Uporabi novejšo knjižnico simbolov"
+
+msgid "Import Symbol…"
+msgstr "Uvozi simbol…"
+
+msgid "Export Symbol…"
+msgstr "Izvozi simbol…"
+
+msgid "Draw pixels"
+msgstr "Riši slikovne pike"
+
+msgid "No custom symbol is stored in this slot."
+msgstr "Na tem mestu ni shranjenega simbola po meri."
+
+msgid "Page"
+msgstr "Stran"
+
+msgid "Tile"
+msgstr "Ploščica"
+
+msgid "Color"
+msgstr "Barva"
+
+msgid "Transparency"
+msgstr "Prosojnost"
+
+msgid "Program Symbols…"
+msgstr "Programiraj simbole…"
+
+msgid "Compare Symbols with Device"
+msgstr "Primerjaj simbole z napravo"
+
+msgid "Write the custom symbols to this device and restart it?"
+msgstr "Zapišem simbole po meri v to napravo in jo znova zaženem?"
+
+msgid "Select the device type and enable a page in Parameters to edit its layout."
+msgstr "Izberite vrsto naprave in omogočite stran v Parametrih, da uredite postavitev."
+
+msgid "Restore Default Symbol"
+msgstr "Obnovi privzeti simbol"
+
+msgid "Standby Page (Day)"
+msgstr "Stran pripravljenosti (dan)"
+
+msgid "Standby Page (Night)"
+msgstr "Stran pripravljenosti (noč)"
+
+msgid "Special Symbol"
+msgstr "Poseben simbol"
+
+msgid "Mode: Automatic"
+msgstr "Način: samodejno"
+
+msgid "Mode: Comfort"
+msgstr "Način: udobje"
+
+msgid "Mode: Standby"
+msgstr "Način: pripravljenost"
+
+msgid "Mode: Night"
+msgstr "Način: noč"
+
+msgid "Mode: Frost Protection"
+msgstr "Način: zaščita pred zmrzaljo"
+
+msgid "Mode: Heat Protection"
+msgstr "Način: zaščita pred vročino"
+
+msgid "Temperature"
+msgstr "Temperatura"
+
+msgid "Cooling"
+msgstr "Hlajenje"
+
+msgid "Heating"
+msgstr "Ogrevanje"
+
+msgid "Functionally Linked Symbols"
+msgstr "Simboli, vezani na funkcije"
+
+msgid "Normal Symbols"
+msgstr "Običajni simboli"
+
+msgid "This symbol is fixed and cannot be changed."
+msgstr "Ta simbol je fiksen in ga ni mogoče spremeniti."
+
+msgid "No symbol preview is available in this project."
+msgstr "V tem projektu ni predogleda simbola."
+
+msgid "Import: PNG/BMP, exactly 64 x 64 pixels, or MDT .data."
+msgstr "Uvoz: PNG/BMP, natanko 64 x 64 slikovnih pik, ali MDT .data."
+
+msgid "Format Details"
+msgstr "Podrobnosti oblike"
+
+msgid "Images are not resized. Use black and white with a solid white background. Transparency is ignored."
+msgstr "Velikost slik se ne spreminja. Uporabite črno-belo sliko z neprosojnim belim ozadjem. Prosojnost se prezre."
+
+msgid "Colors are converted to the average of red, green and blue. Values below 128 appear black on the device; 128 and above appear white."
+msgstr "Barve se pretvorijo v povprečje rdeče, zelene in modre. Vrednosti pod 128 so na napravi prikazane črno, od 128 naprej belo."
+
+msgid "MDT .data contains one symbol: 514 bytes including a valid checksum."
+msgstr "MDT .data vsebuje en simbol: 514 bajtov z veljavno kontrolno vsoto."
+
+msgid "Export saves the selected symbol as a 64 x 64 PNG. Imported grayscale values are preserved."
+msgstr "Izvoz shrani izbrani simbol kot PNG 64 x 64. Uvožene sivinske vrednosti se ohranijo."
+
+msgid "Import replaces only the selected symbol in the project. To transfer it to the device, use {button}."
+msgstr "Uvoz zamenja samo izbrani simbol v projektu. Za prenos v napravo uporabite {button}."
+
+msgid "Load Default Symbols"
+msgstr "Naloži privzete simbole"
+
+msgid "Load Defaults (1st Generation)"
+msgstr "Naloži privzete (1. generacija)"
+
+msgid "Load Defaults (2nd Generation)"
+msgstr "Naloži privzete (2. generacija)"
+
+msgid "Import Symbol Library…"
+msgstr "Uvozi knjižnico simbolov…"
+
+msgid "Export Symbol Library…"
+msgstr "Izvozi knjižnico simbolov…"
+
+msgid "Invert imported library"
+msgstr "Obrni barve uvožene knjižnice"
+
+msgid "Include default symbols when programming"
+msgstr "Pri programiranju vključi privzete simbole"
+
+msgid "Synchronize Symbols"
+msgstr "Sinhroniziraj simbole"
+
+msgid "Loading defaults replaces all custom symbols in the project. Undo restores them. Program with defaults included to transfer the entire library."
+msgstr "Nalaganje privzetih simbolov zamenja vse lastne simbole v projektu. Razveljavitev jih obnovi. Za prenos celotne knjižnice pri programiranju vključi privzete simbole."
+
+msgid "ZIP: Symbol_{first}.bmp through Symbol_{last}.bmp at the archive root, each 64 x 64 pixels. Import replaces all editable symbols; export saves their black-and-white device pixels."
+msgstr "ZIP: Symbol_{first}.bmp do Symbol_{last}.bmp v korenu arhiva, vsak 64 x 64 slikovnih pik. Uvoz zamenja vse uredljive simbole; izvoz shrani njihove črno-bele pike za napravo."
+
+msgid "Compare only reads checksums. Synchronize also refreshes Smart device checksums, without changing pixels or the project."
+msgstr "Primerjava samo prebere kontrolne vsote. Sinhronizacija tudi osveži kontrolne vsote naprave Smart, brez spreminjanja pik ali projekta."
+
+msgid "Write the entire symbol library, including defaults, to this device and restart it?"
+msgstr "Zapiši celotno knjižnico simbolov, vključno s privzetimi, v to napravo in jo znova zaženi?"
+
+msgid "The complete default library is not attached to this project."
+msgstr "Celotna privzeta knjižnica ni priložena temu projektu."
+
+msgid "The project changed while choosing the library. Please import it again."
+msgstr "Projekt se je med izbiro knjižnice spremenil. Uvozi jo znova."
+
+msgid "Read Symbols from Device"
+msgstr "Preberi simbole iz naprave"
+
+msgid "Import from .etsapp…"
+msgstr "Uvozi iz .etsapp…"
+
+msgid "Manage Symbol Library"
+msgstr "Upravljaj knjižnico simbolov"
+
+msgid "Reads the device's images into this project. Reading takes about 2:30 minutes. Undo restores the previous symbols; the device is unchanged."
+msgstr "Prebere slike naprave v ta projekt. Branje traja približno 2 minuti in 30 sekund. Razveljavitev obnovi prejšnje simbole; naprava ostane nespremenjena."
+
+msgid "Choose the MDT .etsapp file. Only symbol resources are added; custom symbols and library selections stay unchanged."
+msgstr "Izberite datoteko MDT .etsapp. Dodajo se le viri simbolov; lastni simboli in izbire knjižnic ostanejo nespremenjeni."
+
+msgid "Read Symbols from Device…"
+msgstr "Preberi simbole iz naprave…"
+
+msgid "Read all symbols from {address}? This takes about 2:30 minutes. The images will be saved in this project; the device stays unchanged."
+msgstr "Preberem vse simbole iz naprave {address}? Branje traja približno 2 minuti in 30 sekund. Slike bodo shranjene v ta projekt; naprava ostane nespremenjena."
+
+msgid "Unused reserved memory and PID 27 length/CRC are not compared."
+msgstr "Neuporabljen rezerviran pomnilnik in dolžina/CRC PID 27 se ne primerjata."
+
+msgid "Upper / Rocker"
+msgstr "Zgoraj / Prevesna tipka"
+
+msgid "Lower"
+msgstr "Spodaj"
+
+msgid "LED"
+msgstr "LED"

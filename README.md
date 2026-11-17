@@ -183,9 +183,12 @@ panel, choose the display type, and load or export the display's LVS project (`.
 import/export, undo/redo, preflight and full application programming through GUI and MCP.
 No PowerTool installation is needed; edits update the stored PowerTool configuration, and
 **Recover from the bus** reads it back from the device.
-Hardware behavior remains unverified; initial Powerline domain commissioning is not supported.
+6108/01 and /02 programming has been tested on devices; other hardware behavior remains
+unverified. Initial Powerline domain commissioning is not supported.
 
 **Siemens plug-ins** are supported in **Plugin Config**.
+
+**MDT DCAs**: edit GTS layouts and Smart device symbols, or import/export VisuControl Plus configurations, through **Plugin Config** and MCP; recover stored DCA data from devices that allow it to be read.
 
 **Cockpit and health checks** — a site-wide device table with live status, plus a panel that flags
 issues (missing or duplicate addresses, applications missing from the catalog, unlinked objects,

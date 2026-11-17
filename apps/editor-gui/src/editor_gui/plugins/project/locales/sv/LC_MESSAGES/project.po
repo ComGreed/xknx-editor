@@ -1018,14 +1018,14 @@ msgstr "Utvärderingen misslyckades"
 msgid "Read-only test: compares what a download would write with what is on the device. Nothing is written to the device."
 msgstr "Skrivskyddat test: jämför det en nedladdning skulle skriva med det som finns i enheten. Inget skrivs till enheten."
 
-msgid "Cannot run: the project was changed since it was opened and may no longer match the device. Undo the changes of this session, or save and reopen the project."
-msgstr "Kan inte köras: projektet har ändrats sedan det öppnades och stämmer kanske inte längre med enheten. Ångra ändringarna i den här sessionen, eller spara projektet och öppna det igen."
+msgid "Cannot run: the project was changed since it was opened and may no longer match the device. Undo the changes of this session, or reopen the project."
+msgstr "Kan inte köra: projektet har ändrats sedan det öppnades och kanske inte längre stämmer med enheten. Ångra ändringarna i denna session eller öppna projektet igen."
 
 msgid "Cannot run: no KNX connection. Connect to a gateway ({menu} menu) and make sure the device is reachable at its individual address."
 msgstr "Kan inte köras: ingen KNX-anslutning. Anslut till en gateway (menyn {menu}) och se till att apparaten kan nås på sin individuella adress."
 
-msgid "Match: the generated image is identical to what is on the device."
-msgstr "Överensstämmer: den genererade avbildningen är identisk med den i apparaten."
+msgid "Match: all compared memory bytes and properties match the device."
+msgstr "Matchning: alla jämförda minnesbyte och egenskaper matchar enheten."
 
 msgid "{matched} matched, {changed} would change"
 msgstr "{matched} överensstämmer, {changed} skulle ändras"
@@ -3342,3 +3342,191 @@ msgstr "Välj de två enheter som ska jämföras."
 
 msgid "Loading application programs… {done}/{total}"
 msgstr "Läser in applikationsprogram… {done}/{total}"
+msgid "Symbol"
+msgstr "Symbol"
+
+msgid "Use the newer symbol library"
+msgstr "Använd det nyare symbolbiblioteket"
+
+msgid "Import Symbol…"
+msgstr "Importera symbol…"
+
+msgid "Export Symbol…"
+msgstr "Exportera symbol…"
+
+msgid "Draw pixels"
+msgstr "Rita pixlar"
+
+msgid "No custom symbol is stored in this slot."
+msgstr "Ingen anpassad symbol är sparad på denna plats."
+
+msgid "Page"
+msgstr "Sida"
+
+msgid "Tile"
+msgstr "Ruta"
+
+msgid "Color"
+msgstr "Färg"
+
+msgid "Transparency"
+msgstr "Genomskinlighet"
+
+msgid "Program Symbols…"
+msgstr "Programmera symboler…"
+
+msgid "Compare Symbols with Device"
+msgstr "Jämför symboler med enheten"
+
+msgid "Write the custom symbols to this device and restart it?"
+msgstr "Skriva de anpassade symbolerna till den här enheten och starta om den?"
+
+msgid "Select the device type and enable a page in Parameters to edit its layout."
+msgstr "Välj enhetstyp och aktivera en sida under Parametrar för att redigera layouten."
+
+msgid "Restore Default Symbol"
+msgstr "Återställ standardsymbol"
+
+msgid "Standby Page (Day)"
+msgstr "Standbysida (dag)"
+
+msgid "Standby Page (Night)"
+msgstr "Standbysida (natt)"
+
+msgid "Special Symbol"
+msgstr "Specialsymbol"
+
+msgid "Mode: Automatic"
+msgstr "Läge: automatiskt"
+
+msgid "Mode: Comfort"
+msgstr "Läge: komfort"
+
+msgid "Mode: Standby"
+msgstr "Läge: standby"
+
+msgid "Mode: Night"
+msgstr "Läge: natt"
+
+msgid "Mode: Frost Protection"
+msgstr "Läge: frostskydd"
+
+msgid "Mode: Heat Protection"
+msgstr "Läge: värmeskydd"
+
+msgid "Temperature"
+msgstr "Temperatur"
+
+msgid "Cooling"
+msgstr "Kylning"
+
+msgid "Heating"
+msgstr "Uppvärmning"
+
+msgid "Functionally Linked Symbols"
+msgstr "Funktionsbundna symboler"
+
+msgid "Normal Symbols"
+msgstr "Vanliga symboler"
+
+msgid "This symbol is fixed and cannot be changed."
+msgstr "Den här symbolen är fast och kan inte ändras."
+
+msgid "No symbol preview is available in this project."
+msgstr "Ingen förhandsvisning av symbolen finns i det här projektet."
+
+msgid "Import: PNG/BMP, exactly 64 x 64 pixels, or MDT .data."
+msgstr "Import: PNG/BMP, exakt 64 x 64 pixlar, eller MDT .data."
+
+msgid "Format Details"
+msgstr "Formatdetaljer"
+
+msgid "Images are not resized. Use black and white with a solid white background. Transparency is ignored."
+msgstr "Bilder skalas inte om. Använd svartvitt med en ogenomskinlig vit bakgrund. Genomskinlighet ignoreras."
+
+msgid "Colors are converted to the average of red, green and blue. Values below 128 appear black on the device; 128 and above appear white."
+msgstr "Färger omvandlas till medelvärdet av rött, grönt och blått. Värden under 128 visas svarta på enheten, från 128 visas de vita."
+
+msgid "MDT .data contains one symbol: 514 bytes including a valid checksum."
+msgstr "MDT .data innehåller en symbol: 514 byte inklusive en giltig kontrollsumma."
+
+msgid "Export saves the selected symbol as a 64 x 64 PNG. Imported grayscale values are preserved."
+msgstr "Export sparar den valda symbolen som en PNG på 64 x 64. Importerade gråskalevärden bevaras."
+
+msgid "Import replaces only the selected symbol in the project. To transfer it to the device, use {button}."
+msgstr "Import ersätter endast den valda symbolen i projektet. Använd {button} för att överföra den till enheten."
+
+msgid "Load Default Symbols"
+msgstr "Läs in standardsymboler"
+
+msgid "Load Defaults (1st Generation)"
+msgstr "Läs in standarder (1:a generationen)"
+
+msgid "Load Defaults (2nd Generation)"
+msgstr "Läs in standarder (2:a generationen)"
+
+msgid "Import Symbol Library…"
+msgstr "Importera symbolbibliotek…"
+
+msgid "Export Symbol Library…"
+msgstr "Exportera symbolbibliotek…"
+
+msgid "Invert imported library"
+msgstr "Invertera importerat bibliotek"
+
+msgid "Include default symbols when programming"
+msgstr "Inkludera standardsymboler vid programmering"
+
+msgid "Synchronize Symbols"
+msgstr "Synkronisera symboler"
+
+msgid "Loading defaults replaces all custom symbols in the project. Undo restores them. Program with defaults included to transfer the entire library."
+msgstr "Inläsning av standarder ersätter alla egna symboler i projektet. Ångra återställer dem. Inkludera standarder vid programmering för att överföra hela biblioteket."
+
+msgid "ZIP: Symbol_{first}.bmp through Symbol_{last}.bmp at the archive root, each 64 x 64 pixels. Import replaces all editable symbols; export saves their black-and-white device pixels."
+msgstr "ZIP: Symbol_{first}.bmp till Symbol_{last}.bmp i arkivets rot, vardera 64 x 64 pixlar. Import ersätter alla redigerbara symboler; export sparar deras svartvita enhetspixlar."
+
+msgid "Compare only reads checksums. Synchronize also refreshes Smart device checksums, without changing pixels or the project."
+msgstr "Jämförelse läser bara kontrollsummor. Synkronisering uppdaterar även Smart-enhetens kontrollsummor utan att ändra pixlar eller projektet."
+
+msgid "Write the entire symbol library, including defaults, to this device and restart it?"
+msgstr "Skriva hela symbolbiblioteket inklusive standarder till den här enheten och starta om den?"
+
+msgid "The complete default library is not attached to this project."
+msgstr "Det fullständiga standardbiblioteket är inte bifogat till projektet."
+
+msgid "The project changed while choosing the library. Please import it again."
+msgstr "Projektet ändrades medan biblioteket valdes. Importera det igen."
+
+msgid "Read Symbols from Device"
+msgstr "Läs symboler från enheten"
+
+msgid "Import from .etsapp…"
+msgstr "Importera från .etsapp…"
+
+msgid "Manage Symbol Library"
+msgstr "Hantera symbolbibliotek"
+
+msgid "Reads the device's images into this project. Reading takes about 2:30 minutes. Undo restores the previous symbols; the device is unchanged."
+msgstr "Läser in enhetens bilder i projektet. Läsningen tar cirka 2:30 minuter. Ångra återställer de tidigare symbolerna; enheten ändras inte."
+
+msgid "Choose the MDT .etsapp file. Only symbol resources are added; custom symbols and library selections stay unchanged."
+msgstr "Välj MDT .etsapp-filen. Endast symbolresurser läggs till; egna symboler och biblioteksval ändras inte."
+
+msgid "Read Symbols from Device…"
+msgstr "Läs symboler från enheten…"
+
+msgid "Read all symbols from {address}? This takes about 2:30 minutes. The images will be saved in this project; the device stays unchanged."
+msgstr "Läsa alla symboler från {address}? Läsningen tar cirka 2:30 minuter. Bilderna sparas i detta projekt; enheten förblir oförändrad."
+
+msgid "Unused reserved memory and PID 27 length/CRC are not compared."
+msgstr "Oanvänt reserverat minne och längd/CRC för PID 27 jämförs inte."
+
+msgid "Upper / Rocker"
+msgstr "Övre / Vippa"
+
+msgid "Lower"
+msgstr "Nedre"
+
+msgid "LED"
+msgstr "LED"
