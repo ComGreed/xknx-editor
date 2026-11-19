@@ -1738,3 +1738,7 @@ msgstr "Kun käynnistyksessä ei anneta projektia, avaa viimeksi avoinna olleen 
 
 msgid "Tool catalog"
 msgstr "Työkaluluettelo"
+
+msgid "Without Password"
+msgstr "Ilman salasanaa"
+

@@ -1738,3 +1738,7 @@ msgstr "Kur në nisje nuk jepet asnjë projekt, hapet projekti që ishte hapur i
 
 msgid "Tool catalog"
 msgstr "Katalogu i mjeteve"
+
+msgid "Without Password"
+msgstr "Pa fjalëkalim"
+

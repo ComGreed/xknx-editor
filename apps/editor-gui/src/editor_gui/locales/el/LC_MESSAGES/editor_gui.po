@@ -1738,3 +1738,7 @@ msgstr "Όταν δεν δίνεται έργο κατά την εκκίνηση
 
 msgid "Tool catalog"
 msgstr "Κατάλογος εργαλείων"
+
+msgid "Without Password"
+msgstr "Χωρίς κωδικό πρόσβασης"
+

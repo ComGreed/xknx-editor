@@ -1722,3 +1722,7 @@ msgstr "Başlangıçta proje belirtilmezse en son açık olan projeyi açar. Kor
 
 msgid "Tool catalog"
 msgstr "Araç kataloğu"
+
+msgid "Without Password"
+msgstr "Parolasız"
+

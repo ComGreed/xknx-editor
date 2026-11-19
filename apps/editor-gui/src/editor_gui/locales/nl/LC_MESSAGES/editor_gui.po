@@ -1798,3 +1798,7 @@ msgstr "Als bij het opstarten geen project wordt opgegeven, wordt het laatst geo
 
 msgid "Tool catalog"
 msgstr "Hulpmiddelencatalogus"
+
+msgid "Without Password"
+msgstr "Zonder wachtwoord"
+

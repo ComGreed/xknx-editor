@@ -1754,3 +1754,7 @@ msgstr "Если при запуске проект не указан, откр�
 
 msgid "Tool catalog"
 msgstr "Каталог инструментов"
+
+msgid "Without Password"
+msgstr "Без пароля"
+

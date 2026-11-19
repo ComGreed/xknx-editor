@@ -1895,3 +1895,7 @@ msgstr "Wird beim Start kein Projekt angegeben, wird das zuletzt geöffnete Proj
 
 msgid "Tool catalog"
 msgstr "Werkzeugkatalog"
+
+msgid "Without Password"
+msgstr "Ohne Passwort"
+

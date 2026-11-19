@@ -1738,3 +1738,7 @@ msgstr "Når det ikke angis noe prosjekt ved oppstart, åpnes prosjektet som sis
 
 msgid "Tool catalog"
 msgstr "Verktøykatalog"
+
+msgid "Without Password"
+msgstr "Uten passord"
+

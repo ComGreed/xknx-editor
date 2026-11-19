@@ -1738,3 +1738,7 @@ msgstr "Si no se indica ningún proyecto al iniciar, abre el último proyecto qu
 
 msgid "Tool catalog"
 msgstr "Catálogo de herramientas"
+
+msgid "Without Password"
+msgstr "Sin contraseña"
+

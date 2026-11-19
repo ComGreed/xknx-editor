@@ -1754,3 +1754,7 @@ msgstr "Gdy przy uruchomieniu nie podano projektu, otwiera ostatnio otwarty proj
 
 msgid "Tool catalog"
 msgstr "Katalog narzędzi"
+
+msgid "Without Password"
+msgstr "Bez hasła"
+

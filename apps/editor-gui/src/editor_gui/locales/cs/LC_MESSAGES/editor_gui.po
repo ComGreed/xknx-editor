@@ -1754,3 +1754,7 @@ msgstr "Pokud při spuštění není zadán žádný projekt, otevře naposledy 
 
 msgid "Tool catalog"
 msgstr "Katalog nástrojů"
+
+msgid "Without Password"
+msgstr "Bez hesla"
+

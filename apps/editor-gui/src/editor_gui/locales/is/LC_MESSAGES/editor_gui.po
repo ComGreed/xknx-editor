@@ -1810,3 +1810,7 @@ msgstr "Þegar ekkert verkefni er gefið við ræsingu er síðasta opna verkefn
 
 msgid "Tool catalog"
 msgstr "Verkfæraskrá"
+
+msgid "Without Password"
+msgstr "Án lykilorðs"
+

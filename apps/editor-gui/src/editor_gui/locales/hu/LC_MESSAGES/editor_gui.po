@@ -1794,3 +1794,7 @@ msgstr "Ha indításkor nincs megadva projekt, megnyitja a legutóbb megnyitott 
 
 msgid "Tool catalog"
 msgstr "Eszközkatalógus"
+
+msgid "Without Password"
+msgstr "Jelszó nélkül"
+

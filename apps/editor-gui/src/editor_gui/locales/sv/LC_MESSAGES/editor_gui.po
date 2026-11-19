@@ -1738,3 +1738,7 @@ msgstr "När inget projekt anges vid start öppnas det projekt som senast var ö
 
 msgid "Tool catalog"
 msgstr "Verktygskatalog"
+
+msgid "Without Password"
+msgstr "Utan lösenord"
+

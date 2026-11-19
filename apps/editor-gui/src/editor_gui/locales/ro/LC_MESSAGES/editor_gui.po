@@ -1826,3 +1826,7 @@ msgstr "Când la pornire nu este indicat niciun proiect, deschide ultimul proiec
 
 msgid "Tool catalog"
 msgstr "Catalog de instrumente"
+
+msgid "Without Password"
+msgstr "Fără parolă"
+

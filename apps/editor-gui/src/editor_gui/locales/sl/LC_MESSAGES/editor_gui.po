@@ -1842,3 +1842,7 @@ msgstr "ÄŒe ob zagonu ni podan noben projekt, odpre nazadnje odprti projekt. ZaÅ
 
 msgid "Tool catalog"
 msgstr "Katalog orodij"
+
+msgid "Without Password"
+msgstr "Brez gesla"
+
